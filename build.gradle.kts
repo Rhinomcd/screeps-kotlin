@@ -29,7 +29,8 @@ val screepsPassword: String? by extra(System.getenv("screepsPassword"))
 val screepsToken: String? by extra(System.getenv("screepsToken"))
 val screepsHost: String? by extra(System.getenv("screepsHost"))
 val screepsBranch: String? by extra(System.getenv("screepsBranch"))
-val branch = if (Grgit.open().branch.current.name != "master") {
+val grgit: Grgit = Grgit.open(project.rootDir)
+val branch = if (grgit.branch?.current?.name != "master") {
     "beta-kt"
 } else {
     "master-kt"

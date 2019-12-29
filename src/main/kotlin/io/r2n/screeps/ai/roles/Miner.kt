@@ -60,12 +60,17 @@ object Miner : EmployedCreep {
         return bodyParts.count { it == WORK } < bodyParts.count { it == MOVE } + delta - 1
     }
 }
-
 fun Creep.mine() {
+     room.visual.text("F", memory.assignedSourcePosition)
+
     val target: Source? = room.lookForAt(LOOK_SOURCES,
             memory.assignedSourcePosition.x,
-            memory.assignedSourcePosition.y)?.first()
-    if (target != null && harvest(target) == ERR_NOT_IN_RANGE) {
+            memory.assignedSourcePosition.y)?.firstOrNull()
+    if (target == null) {
+        console.log("ERROR - worker is assigned an unidentifiable source [worker=${name}," +
+                " sourceLocation=${memory.assignedSourcePosition.x}, ${memory.assignedSourcePosition.y}")
+
+    } else if (harvest(target) == ERR_NOT_IN_RANGE) {
         moveTo(target.pos)
     }
 }

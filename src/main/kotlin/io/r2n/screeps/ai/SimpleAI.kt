@@ -11,7 +11,10 @@ import screeps.utils.unsafe.jsObject
 fun gameLoop() {
     val mainSpawn: StructureSpawn = Game.spawns.values.firstOrNull() ?: return
     if (Memory.sources.isEmpty()) {
-        Memory.sources = mainSpawn.room.find(FIND_SOURCES)
+        Memory.sources = mainSpawn.room.find(FIND_SOURCES_ACTIVE)
+    }
+    for (source in Memory.sources) {
+        mainSpawn.room.visual.text("U", source.pos.x, source.pos.y)
     }
 
     //delete memories of creeps that have passed away

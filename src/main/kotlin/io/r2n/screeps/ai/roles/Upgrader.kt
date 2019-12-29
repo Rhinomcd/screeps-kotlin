@@ -8,7 +8,7 @@ import screeps.utils.unsafe.jsObject
 
 object Upgrader : EmployedCreep {
     override val options: SpawnOptions = options {
-        memory = jsObject<CreepMemory> { role = Role.RUNNER }
+        memory = jsObject<CreepMemory> { role = Role.UPGRADER }
 
     }
 

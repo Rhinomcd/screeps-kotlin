@@ -91,9 +91,16 @@ private fun spawnCreeps(creeps: Array<Creep>, spawn: StructureSpawn) {
 
         //Setup gather goons first
         creeps.none { it.memory.role == Role.MINER } -> Role.MINER
-        creeps.none { it.memory.role == Role.RUNNER } -> Role.RUNNER
+        creeps.none { it.memory.role == Role.RUNNER } -> {
+            console.log("spawning runner because none exist")
+            Role.RUNNER
+        }
         creeps.count { it.memory.role == Role.MINER } <= maxGatherSquad -> Role.MINER
-        creeps.count { it.memory.role == Role.RUNNER } <= maxGatherSquad -> Role.RUNNER
+        creeps.count { it.memory.role == Role.RUNNER } <= maxGatherSquad -> {
+            console.log("spawning runner because we're less than max gatherCount [maxGatherCount=${maxGatherSquad}," +
+                    " currentCount=${creeps.count {it.memory.role == Role.RUNNER}}]")
+            Role.RUNNER
+        }
 
         creeps.count { it.memory.role == Role.UPGRADER } <= maxUpgraders -> Role.UPGRADER
 

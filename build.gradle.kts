@@ -35,6 +35,7 @@ val branch = if (grgit.branch?.current?.name != "master") {
 } else {
     "master-kt"
 }
+println("Plugin identifies branch as ${grgit.branch?.current?.name}")
 val host = screepsHost ?: "https://screeps.com"
 
 fun String.encodeBase64() = Base64.getEncoder().encodeToString(this.toByteArray())

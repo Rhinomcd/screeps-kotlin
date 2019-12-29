@@ -8,9 +8,7 @@ import screeps.api.structures.SpawnOptions
 import screeps.utils.memory.memory
 import screeps.utils.unsafe.jsObject
 
-var CreepMemory.assignedSourcePosition: RoomPosition by memory {
-    Memory.sources[Memory.lastMinerAssignment].pos
-}
+var CreepMemory.assignedSourcePosition: RoomPosition? by memory()
 
 object Miner : EmployedCreep {
     private val bodyRatio = mapOf(
@@ -21,7 +19,6 @@ object Miner : EmployedCreep {
     override val options: SpawnOptions = options {
         memory = jsObject<CreepMemory> {
             role = Role.MINER
-            assignedSourcePosition = Memory.sources[Memory.lastMinerAssignment].pos
         }
     }
 
@@ -60,17 +57,30 @@ object Miner : EmployedCreep {
         return bodyParts.count { it == WORK } < bodyParts.count { it == MOVE } + delta - 1
     }
 }
+
+fun Creep.getAssignedSourcePosition() {
+    memory.assignedSourcePosition = room.memory.sources[room.memory.lastMinerAssignment].pos
+}
+
+fun Creep.debugAssignedSources() {
+    if (memory.assignedSourcePosition != null) {
+        room.visual.text("F", memory.assignedSourcePosition!!)
+    }
+}
+
 fun Creep.mine() {
-     room.visual.text("F", memory.assignedSourcePosition)
+    getAssignedSourcePosition()
+    debugAssignedSources()
+    if (memory.assignedSourcePosition != null) {
+        val target: Source? = room.lookForAt(LOOK_SOURCES,
+                memory.assignedSourcePosition!!.x,
+                memory.assignedSourcePosition!!.y)?.firstOrNull()
+        if (target == null) {
+            console.log("ERROR - worker assigned an unidentifiable source [worker=${name}," +
+                    " sourceLocation=${memory.assignedSourcePosition!!.x}, ${memory.assignedSourcePosition!!.y}")
 
-    val target: Source? = room.lookForAt(LOOK_SOURCES,
-            memory.assignedSourcePosition.x,
-            memory.assignedSourcePosition.y)?.firstOrNull()
-    if (target == null) {
-        console.log("ERROR - worker is assigned an unidentifiable source [worker=${name}," +
-                " sourceLocation=${memory.assignedSourcePosition.x}, ${memory.assignedSourcePosition.y}")
-
-    } else if (harvest(target) == ERR_NOT_IN_RANGE) {
-        moveTo(target.pos)
+        } else if (harvest(target) == ERR_NOT_IN_RANGE) {
+            moveTo(target.pos)
+        }
     }
 }

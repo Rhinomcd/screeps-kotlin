@@ -10,11 +10,13 @@ import screeps.utils.unsafe.jsObject
 
 fun gameLoop() {
     val mainSpawn: StructureSpawn = Game.spawns.values.firstOrNull() ?: return
-    if (Memory.sources.isEmpty()) {
-        Memory.sources = mainSpawn.room.find(FIND_SOURCES_ACTIVE)
-    }
-    for (source in Memory.sources) {
-        mainSpawn.room.visual.text("U", source.pos.x, source.pos.y)
+    for ((_, room) in Game.rooms) {
+        if (room.memory.sources.isEmpty()) {
+            room.memory.sources = mainSpawn.room.find(FIND_SOURCES_ACTIVE)
+        }
+        for (source in room.memory.sources) {
+            mainSpawn.room.visual.text("U", source.pos.x, source.pos.y)
+        }
     }
 
     //delete memories of creeps that have passed away
@@ -77,7 +79,7 @@ fun gameLoop() {
 private fun spawnCreeps(creeps: Array<Creep>, spawn: StructureSpawn) {
 
     val maxHarvesters = 1
-    val maxGatherSquad = Memory.sources.size
+    val maxGatherSquad = spawn.room.memory.sources.size
     val maxUpgraders = 3
 
     val role: Role = when {
@@ -104,7 +106,7 @@ private fun spawnCreeps(creeps: Array<Creep>, spawn: StructureSpawn) {
     when (role) {
         Role.MINER -> {
             if (Miner.spawn(spawn, 300) == OK) {
-                Memory.lastMinerAssignment = incrementLastMinerAssignment()
+                spawn.room.memory.lastMinerAssignment = incrementLastMinerAssignment(spawn.room)
             }
         }
         Role.RUNNER -> Runner.spawn(spawn)
@@ -115,10 +117,9 @@ private fun spawnCreeps(creeps: Array<Creep>, spawn: StructureSpawn) {
     }
 }
 
-fun incrementLastMinerAssignment(): Int {
-    console.log("increment last miner")
-    return if (Memory.lastMinerAssignment + 1 < Memory.sources.size)
-        Memory.lastMinerAssignment + 1
+fun incrementLastMinerAssignment(room: Room): Int {
+    return if (room.memory.lastMinerAssignment + 1 < room.memory.sources.size)
+        room.memory.lastMinerAssignment + 1
     else
         0
 

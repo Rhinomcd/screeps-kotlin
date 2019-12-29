@@ -2,11 +2,10 @@ package io.r2n.screeps.ai.roles
 
 import screeps.api.*
 import screeps.api.structures.SpawnOptions
-import screeps.api.structures.Structure
 import screeps.utils.memory.memory
 import screeps.utils.unsafe.jsObject
 
-var CreepMemory.assignedBuildingSite: ConstructionSite? by memory()
+var CreepMemory.assignedBuildingSiteId: String? by memory()
 
 object Builder : EmployedCreep {
     override val options: SpawnOptions = options {
@@ -30,15 +29,17 @@ fun Creep.build(assignedRoom: Room = this.room) {
         say("🚧 build")
     }
 
-    if (memory.assignedBuildingSite != null) {
-        if (memory.working) {
-            when (val buildStatusCode = build(memory.assignedBuildingSite!!)) {
+    if (memory.assignedBuildingSiteId != null) {
+        val target: ConstructionSite? = Game.getObjectById<ConstructionSite>(memory.assignedBuildingSiteId)
+        if (memory.working && target != null) {
+            when (val buildStatusCode = build(target)) {
                 ERR_NOT_IN_RANGE -> {
-                    val code = moveTo(memory.assignedBuildingSite!!)
+                    val code = moveTo(target)
                 }
                 ERR_INVALID_TARGET -> {
-                    memory.assignedBuildingSite = null
+                    memory.assignedBuildingSiteId = null
                 }
+                OK -> run { }
                 else -> {
                     console.log("builder error code: $buildStatusCode")
                 }
@@ -47,8 +48,8 @@ fun Creep.build(assignedRoom: Room = this.room) {
             moveToAndWithdrawEnergy(findNearestEnergyStructure())
         }
     } else {
-        memory.assignedBuildingSite = pos.findClosestByPath(FIND_CONSTRUCTION_SITES)
-        if (memory.assignedBuildingSite == null) {
+        memory.assignedBuildingSiteId = pos.findClosestByPath(FIND_MY_CONSTRUCTION_SITES)?.id.orEmpty()
+        if (memory.assignedBuildingSiteId.isNullOrBlank()) {
             say("Greetings, snackbar")
             suicide()
         }

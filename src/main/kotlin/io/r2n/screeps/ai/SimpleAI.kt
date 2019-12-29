@@ -82,6 +82,7 @@ private fun spawnCreeps(creeps: Array<Creep>, spawn: StructureSpawn) {
     val maxGatherSquad = spawn.room.memory.sources.size
     val maxUpgraders = 3
 
+    val maxBuilders = 3
     val role: Role = when {
         //First creep should be a harvester, then roll out the big bois
         creeps.none { it.memory.role == Role.MINER } &&
@@ -104,7 +105,8 @@ private fun spawnCreeps(creeps: Array<Creep>, spawn: StructureSpawn) {
 
         creeps.count { it.memory.role == Role.UPGRADER } <= maxUpgraders -> Role.UPGRADER
 
-        spawn.room.find(FIND_MY_CONSTRUCTION_SITES).isNotEmpty() -> Role.BUILDER
+        spawn.room.find(FIND_MY_CONSTRUCTION_SITES).isNotEmpty()  &&
+        creeps.count { it.memory.role == Role.BUILDER } < maxBuilders -> Role.BUILDER
 
         else -> return
     }

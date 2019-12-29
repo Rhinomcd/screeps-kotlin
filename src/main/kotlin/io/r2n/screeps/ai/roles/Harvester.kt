@@ -17,9 +17,12 @@ object Harvester : EmployedCreep {
 
 fun Creep.harvest(fromRoom: Room = this.room, toRoom: Room = this.room) {
     if ((carry.energy < carryCapacity) || (memory.role == Role.MINER)) {
-        val sources = fromRoom.find(FIND_SOURCES)
-        if (harvest(sources[0]) == ERR_NOT_IN_RANGE) {
-            moveTo(sources[0].pos)
+        val source = pos.findClosestByPath(FIND_DROPPED_RESOURCES) ?: pos.findClosestByPath(FIND_SOURCES)
+        if (source is Resource) {
+            pickup(source)
+        }
+        if (source != null) {
+            moveTo(source as NavigationTarget)
         }
     } else {
         moveToAndTransferEnergy(findNearestEnergyStructure())

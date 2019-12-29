@@ -28,14 +28,21 @@ val screepsUser: String? by extra(System.getenv("screepsUser"))
 val screepsPassword: String? by extra(System.getenv("screepsPassword"))
 val screepsToken: String? by extra(System.getenv("screepsToken"))
 val screepsHost: String? by extra(System.getenv("screepsHost"))
-val screepsBranch: String? by extra(System.getenv("screepsBranch"))
 val grgit: Grgit = Grgit.open(project.rootDir)
-val branch = if (grgit.branch?.current?.name != "master") {
-    "beta-kt"
-} else {
-    "master-kt"
+
+var screepsBranch: String? by extra(System.getenv("screepsBranch"))
+var branch: String = grgit.branch.current.name
+if (branch == "HEAD" && System.getenv("TRAVIS_BRANCH").isNotBlank()) {
+    branch = System.getenv("TRAVIS_BRANCH")
 }
-println("Plugin identifies branch as ${grgit.branch?.current?.name}")
+if (screepsBranch == null) {
+    screepsBranch = if (branch != "master") {
+        "beta-kt"
+    } else {
+        "master-kt"
+    }
+
+}
 val host = screepsHost ?: "https://screeps.com"
 
 fun String.encodeBase64() = Base64.getEncoder().encodeToString(this.toByteArray())
@@ -68,7 +75,7 @@ tasks {
         else
             mapOf("Authorization" to "Basic " + "$screepsUser:$screepsPassword".encodeBase64())
         contentType = groovyx.net.http.ContentType.JSON
-        requestBody = mapOf("branch" to branch, "modules" to modules)
+        requestBody = mapOf("branch" to screepsBranch, "modules" to modules)
 
         doFirst {
             if (screepsUser == null && screepsPassword == null && screepsToken == null) {
@@ -81,7 +88,7 @@ tasks {
             val jsFiles = minifiedCodeLocation.listFiles { _, name -> name.endsWith(".js") }
             modules.putAll(jsFiles.associate { it.nameWithoutExtension to it.readText() })
 
-            println("uploading ${jsFiles.count()} files to branch $branch on server $host")
+            println("uploading ${jsFiles.count()} files to branch $screepsBranch on server $host")
         }
 
     }

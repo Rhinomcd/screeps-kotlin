@@ -57,7 +57,7 @@ fun Creep.build(assignedRoom: Room = this.room) {
                 }
             }
         } else if (!memory.working) {
-            moveToAndWithdrawEnergy(findNearestEnergyStructure())
+            moveToAndWithdrawEnergy(findNearestEnergyStructureWithEnergy())
             say("GET N R G")
         }
     } else {

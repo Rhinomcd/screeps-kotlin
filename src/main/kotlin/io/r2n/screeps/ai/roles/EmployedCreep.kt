@@ -60,6 +60,11 @@ fun Creep.findNearestEnergyStructure(): Structure? {
             .minBy { pos.getRangeTo(it) }
 }
 
+fun Creep.findNearestEnergyStructureWithEnergy(): Structure? {
+    return findEnergyStructures().filter { it.energy > 0 }.map { it as Structure }.minBy { pos.getRangeTo(it) }
+
+}
+
 fun Creep.moveToAndTransferEnergy(target: Structure?) {
     if (target != null) {
         if (transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {

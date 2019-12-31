@@ -33,7 +33,7 @@ object Miner : EmployedCreep {
                     body += WORK
                     usedEnergy += BODYPART_COST[WORK]!!
                 }
-                addingMOVEWontExceedMax(usedEnergy, maxEnergy) -> {
+                addingPartWontExceedMax(MOVE, usedEnergy, maxEnergy) -> {
                     body += MOVE
                     usedEnergy += BODYPART_COST[MOVE]!!
                 }
@@ -49,9 +49,6 @@ object Miner : EmployedCreep {
         return usedEnergy + getBodyCost(arrayOf(WORK)) <= maxEnergy
     }
 
-    private fun addingMOVEWontExceedMax(usedEnergy: Int, maxEnergy: Int): Boolean {
-        return usedEnergy + getBodyCost(arrayOf(MOVE)) <= maxEnergy
-    }
 
     private fun thereAreLessWorkThanMoveParts(bodyParts: List<BodyPartConstant>, delta: Int = 0): Boolean {
         return bodyParts.count { it == WORK } < bodyParts.count { it == MOVE } + delta - 1

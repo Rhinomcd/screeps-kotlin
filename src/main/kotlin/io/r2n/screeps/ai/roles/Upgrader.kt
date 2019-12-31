@@ -13,8 +13,17 @@ object Upgrader : EmployedCreep {
     }
 
     override fun calculateOptimalBodyParts(maxEnergy: Int): Array<BodyPartConstant> {
-        //TODO make dynameic
-        return arrayOf(WORK, CARRY, MOVE, MOVE)
+        var body = emptyList<BodyPartConstant>()
+        var usedEnergy = 0
+        sequenceOf(WORK, MOVE, CARRY, CARRY, WORK).takeWhile { usedEnergy <= maxEnergy }.forEach {
+            when {
+                addingPartWontExceedMax(it, usedEnergy, maxEnergy) -> {
+                    body += it
+                    usedEnergy += BODYPART_COST[it]!!
+                }
+            }
+        }
+        return body.toTypedArray()
     }
 }
 

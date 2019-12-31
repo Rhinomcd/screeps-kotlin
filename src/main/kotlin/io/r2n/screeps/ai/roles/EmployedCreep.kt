@@ -36,6 +36,12 @@ interface EmployedCreep {
     }
 }
 
+
+fun addingPartWontExceedMax(part: BodyPartConstant, usedEnergy: Int, maxEnergy: Int): Boolean {
+    return usedEnergy + getBodyCost(arrayOf(part)) <= maxEnergy
+}
+
+
 fun Creep.findEnergyStructures(): List<EnergyContainer> {
     return room.find(FIND_STRUCTURES)
             .filter {

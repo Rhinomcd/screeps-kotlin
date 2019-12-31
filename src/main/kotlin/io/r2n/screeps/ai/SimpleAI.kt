@@ -118,10 +118,10 @@ private fun spawnCreeps(creeps: Array<Creep>, spawn: StructureSpawn) {
                 spawn.room.memory.lastMinerAssignment = incrementLastMinerAssignment(spawn.room)
             }
         }
-        Role.RUNNER -> Runner.spawn(spawn)
-        Role.BUILDER -> Builder.spawn(spawn)
+        Role.RUNNER -> Runner.spawn(spawn, 250)
+        Role.BUILDER -> Builder.spawn(spawn, 200)
         Role.HARVESTER -> Harvester.spawn(spawn)
-        Role.UPGRADER -> Upgrader.spawn(spawn)
+        Role.UPGRADER -> Upgrader.spawn(spawn, 200)
         else -> console.log("ERROR - can't spawn unassigned creep")
     }
 }

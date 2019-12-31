@@ -11,11 +11,31 @@ object Runner : EmployedCreep {
     }
 
     override fun calculateOptimalBodyParts(maxEnergy: Int): Array<BodyPartConstant> {
-        //TODO make dynamic
-        return arrayOf(CARRY, CARRY, MOVE, MOVE)
+        var body = emptyList<BodyPartConstant>()
+        var usedEnergy = 0
+        loop@ while (usedEnergy <= maxEnergy) {
+            when {
+                thereAreLessCarryThanMove(body) && addingPartWontExceedMax(CARRY, usedEnergy, maxEnergy) -> {
+                    body += CARRY
+                    usedEnergy += BODYPART_COST[CARRY]!!
+                }
+                addingPartWontExceedMax(MOVE, usedEnergy, maxEnergy) -> {
+                    body += MOVE
+                    usedEnergy += BODYPART_COST[MOVE]!!
+                }
+                else -> {
+                    break@loop
+                }
+            }
+        }
+        return body.toTypedArray()
     }
 
 
+}
+
+private fun thereAreLessCarryThanMove(bodyParts: List<BodyPartConstant>, delta: Int = 0): Boolean {
+    return bodyParts.count { it == MOVE } > bodyParts.count { it == CARRY } + delta - 1
 }
 
 fun Creep.run() {

@@ -13,10 +13,18 @@ object Builder : EmployedCreep {
     }
 
     override fun calculateOptimalBodyParts(maxEnergy: Int): Array<BodyPartConstant> {
-        //TODO Implement this
-        return arrayOf(WORK, CARRY, MOVE)
+        var body = emptyList<BodyPartConstant>()
+        var usedEnergy = 0
+        sequenceOf(WORK, CARRY, MOVE).takeWhile { usedEnergy <= maxEnergy }.forEach {
+            when {
+                addingPartWontExceedMax(it, usedEnergy, maxEnergy) -> {
+                    body += it
+                    usedEnergy += BODYPART_COST[it]!!
+                }
+            }
+        }
+        return body.toTypedArray()
     }
-
 }
 
 fun Creep.build(assignedRoom: Room = this.room) {
@@ -30,17 +38,20 @@ fun Creep.build(assignedRoom: Room = this.room) {
     }
 
     if (memory.assignedBuildingSiteId != null) {
-        val target: ConstructionSite? = Game.getObjectById<ConstructionSite>(memory.assignedBuildingSiteId)
+        val target: ConstructionSite? = Game.getObjectById(memory.assignedBuildingSiteId)
         if (memory.working && target != null) {
             when (val buildStatusCode = build(target)) {
                 ERR_NOT_IN_RANGE -> {
                     val code = moveTo(target)
+                    say("RANGE")
                 }
                 ERR_INVALID_TARGET -> {
                     memory.assignedBuildingSiteId = null
+                    say("TARGET")
                 }
-                OK -> run { }
+                OK -> say("OK")
                 else -> {
+                    say("NOT OK")
                     console.log("builder error code: $buildStatusCode")
                 }
             }

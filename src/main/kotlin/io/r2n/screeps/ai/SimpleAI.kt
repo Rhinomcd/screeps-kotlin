@@ -12,7 +12,7 @@ fun gameLoop() {
     val mainSpawn: StructureSpawn = Game.spawns.values.firstOrNull() ?: return
     for ((_, room) in Game.rooms) {
         if (room.memory.sources.isEmpty()) {
-            room.memory.sources = mainSpawn.room.find(FIND_SOURCES_ACTIVE)
+            room.memory.sources = mainSpawn.room.find(FIND_SOURCES)
         }
         for (source in room.memory.sources) {
             mainSpawn.room.visual.text("U", source.pos.x, source.pos.y)

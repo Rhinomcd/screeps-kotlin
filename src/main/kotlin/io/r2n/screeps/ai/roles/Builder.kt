@@ -39,6 +39,7 @@ fun Creep.build(assignedRoom: Room = this.room) {
 
     if (memory.assignedBuildingSiteId != null) {
         val target: ConstructionSite? = Game.getObjectById(memory.assignedBuildingSiteId)
+        say("TARGET: ${target}")
         if (memory.working && target != null) {
             when (val buildStatusCode = build(target)) {
                 ERR_NOT_IN_RANGE -> {
@@ -55,10 +56,12 @@ fun Creep.build(assignedRoom: Room = this.room) {
                     console.log("builder error code: $buildStatusCode")
                 }
             }
-        } else {
+        } else if (!memory.working) {
             moveToAndWithdrawEnergy(findNearestEnergyStructure())
+            say("GET N R G")
         }
     } else {
+        say("ELSE")
         memory.assignedBuildingSiteId = pos.findClosestByPath(FIND_MY_CONSTRUCTION_SITES)?.id.orEmpty()
         if (memory.assignedBuildingSiteId.isNullOrBlank()) {
             say("Greetings, snackbar")
